@@ -24,8 +24,15 @@ program heat_solve
 
   real(kind=dp) :: start, stop ! Timers
 
-  ! TODO start: initialize MPI
+  !===================== MPI variables ==============================!
 
+  integer :: rc, rank, ntasks
+
+  !==================================================================!
+
+  call mpi_init(rc) 
+  call mpi_comm_size(mpi)
+ 
   ! TODO end
 
   call initialize(current, previous, nsteps, parallelization)
