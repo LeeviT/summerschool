@@ -13,13 +13,20 @@ contains
     type(field), intent(inout) :: field0
     type(parallel_data), intent(in) :: parallel
 
-    integer :: ierr
+    integer :: ierr, status(mpi_status_size)
 
+    write (*,*) "done", parallel%rank
     ! TODO start: implement halo exchange
     ! Send to left, receive from right
-
+    if (parallel%rank < parallel%size-1) then
+       call mpi_send(field0%data(:,field0%nx-1), field0%ny, mpi_double_precision, & 
+                     parallel%nright, parallel%nright, mpi_comm_world, ierr)
+    end if     
     ! Send to right, receive from left
-
+    if (parallel%rank .ne. 0) then
+       call mpi_recv(field0%data(:,1), field0%ny, mpi_double_precision, & 
+                     parallel%nleft, parallel%rank, mpi_comm_world, status, ierr)
+    end if
     ! TODO end
 
   end subroutine exchange

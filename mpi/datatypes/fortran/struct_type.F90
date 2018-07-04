@@ -30,7 +30,12 @@ program datatype_struct
      end do
   end if
 
+  blocklen = [3, 1, 2]
+  disp = [1, 7, 14]
   ! TODO: define the datatype for type particle
+  call mpi_type_create_struct(3, blocklen, disp, [mpi_real, mpi_integer, &
+                              mpi_character], particle_mpi_type, ierror)
+  call mpi_type_commit(particle_mpi_type, ierror)
 
   ! TODO: Check extent.
   ! (Not really neccessary on most systems.)

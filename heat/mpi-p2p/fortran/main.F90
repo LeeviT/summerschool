@@ -24,17 +24,14 @@ program heat_solve
 
   real(kind=dp) :: start, stop ! Timers
 
-  !===================== MPI variables ==============================!
-
+  !================= MPI variables and init =========================!
   integer :: rc, rank, ntasks
 
+  call mpi_init(rc)
+  ! call mpi_comm_rank(mpi_comm_world, rank, rc)
+  ! call mpi_comm_size(mpi_comm_world, ntasks, rc)
   !==================================================================!
-
-  call mpi_init(rc) 
-  call mpi_comm_size(mpi)
- 
-  ! TODO end
-
+  
   call initialize(current, previous, nsteps, parallelization)
 
   ! Draw the picture of the initial state
@@ -67,8 +64,6 @@ program heat_solve
 
   call finalize(current, previous)
 
-  ! TODO start: finalize MPI
-
-  ! TODO end
+  call mpi_finalize(rc)
 
 end program heat_solve

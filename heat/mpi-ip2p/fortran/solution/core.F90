@@ -39,6 +39,7 @@ contains
   !   dt (real(dp)): time step value
   ! Update only the border-independent part of the field
   subroutine evolve_interior(curr, prev, a, dt)
+    use omp_lib
     implicit none
     type(field), intent(inout) :: curr, prev
     real(dp) :: a, dt
@@ -47,6 +48,7 @@ contains
     nx = curr%nx
     ny = curr%ny
 
+    !$omp parallel do private(i,j) shared(nx,ny,curr,prev,a,dt)
     do j = 2, ny-1
        do i = 1, nx
           curr%data(i, j) = prev%data(i, j) + a * dt * &
@@ -56,6 +58,7 @@ contains
                &   prev%data(i, j+1)) / curr%dy**2)
        end do
     end do
+    !$omp end parallel do
   end subroutine evolve_interior
 
   ! Finalize the non-blocking communication

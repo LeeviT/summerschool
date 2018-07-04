@@ -27,18 +27,41 @@ program pario
 
   localvector = [(i + my_id * localsize, i=1,localsize)]
 
-  call single_writer()
+  call single_writer(localsize, datasize, rc, fullvector, localvector)
 
   deallocate(localvector)
   call mpi_finalize(rc)
 
 contains
 
-  subroutine single_writer()
+  subroutine single_writer(localsize, datasize, rc, fullvector, localvector)
+    use mpi
     implicit none
+    integer :: localsize, datasize, rc
+    integer, dimension(datasize) :: fullvector
+    integer, dimension(localsize) :: localvector
+    integer :: rank, file, dsize
+    integer(kind=mpi_offset_kind) :: offset
 
+    call mpi_type_size(mpi_integer, dsize, rc)
+    call mpi_comm_rank(mpi_comm_world, rank, rc)
+
+    offset = rank*localsize*dsize    
+
+    call mpi_file_open(mpi_comm_world, "spokesmpi.dat", mpi_mode_create+ &
+                       mpi_mode_wronly, mpi_info_null, file, rc)
+    call mpi_file_write_at_all(file, offset, localvector, localsize, mpi_integer, &
+                            mpi_status_ignore, rc)
     ! TODO: Implement a function that writers the whole array of elements
     !       to a file so that single process is responsible for the file io
+    ! call mpi_gather(localvector, localsize, mpi_integer, fullvector, datasize, &
+    !                mpi_integer, 0, mpi_comm_world, rc)
+    ! if (rank .eq. 0) then
+    !    open(12, file="spokesio.dat")
+    !    write(12, *) fullvector
+    !    close(12)
+    ! end if
+    call mpi_file_close(file, rc)
 
   end subroutine single_writer
 
